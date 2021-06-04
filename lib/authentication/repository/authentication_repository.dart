@@ -1,0 +1,100 @@
+import 'dart:convert';
+import 'package:http/http.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:http/http.dart' as http;
+import 'package:starterapp/authentication/models/models.dart';
+
+abstract class AuthenticationService {
+  Future<User> getCurrentUser();
+  Future<User> login(String email, String password);
+  Future<void> signOut();
+}
+
+class AuthenticationRepository extends AuthenticationService {
+  static const String baseUrl = "https://reqres.in";
+  Map<String, String> headers = {"Content-type": "application/json",
+    "charset":"UTF-8"};
+  final key = 'current_user';
+
+  //get user data from preference
+  @override
+  Future<User> getCurrentUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? userString = prefs.getString(key);
+    Map<String, dynamic> userMap =  (userString !=null)? json.decode(userString) : null;
+    User user = User.fromJson(userMap);
+    print('currentUser $user!');
+    return user;
+  }
+
+  // make POST request to login
+  @override
+  Future<User> login(String email, String password) async {
+    final uri = Uri.parse(baseUrl + '/api/login');
+    var reqBody = {};
+    reqBody["email"] = email;
+    reqBody["password"] = password;
+    String reqBodyJson = jsonEncode(reqBody);
+    try {
+      print("reqBody ${reqBodyJson}");
+      Response response = await http.post(uri, headers: headers, body: reqBodyJson);
+      print("reponse ${response.body}");
+      final loginReponse = LoginResponse.fromJson(jsonDecode(response.body));
+      print("loginResponse ${loginReponse.toString()}");
+      User user = User(name: '-', email: email, token: loginReponse.token);
+      saveUser(user);
+      return user;
+    }catch(e){
+      print("exception $e");
+      throw e;
+    }
+  }
+
+  // make POST request to register
+  @override
+  Future<User> register(String email, String password) async {
+    final registerUri = Uri.parse(baseUrl + '/api/register');
+    var reqBody = {};
+    reqBody["email"] = email;
+    reqBody["password"] = password;
+    String reqBodyJson = jsonEncode(reqBody);
+    try {
+      print("reqBody ${reqBodyJson}");
+      Response response = await http.post(registerUri, headers: headers, body: reqBodyJson);
+      print("reponse ${response.body}");
+      final signUpReponse = SignUpResponse.fromJson(jsonDecode(response.body));
+      print("signUpResponse ${signUpReponse.toString()}");
+
+      int userId = signUpReponse.id;
+      print("userId ${userId}");
+      final getUserUri = Uri.parse(baseUrl + '/api/users/${userId}');
+      Response rep = await http.get(getUserUri, headers: headers);
+      print("rep ${rep.body.toString()}");
+      final getUserReponse = GetUserResponse.fromJson(jsonDecode(rep.body));
+      User user = User(name: '${getUserReponse.data!.firstName} ${getUserReponse.data!.lastName}' , email:
+      '${getUserReponse.data!.email}', token: signUpReponse.token);
+      print('user $user');
+      saveUser(user);
+      return user;
+    }catch(e){
+      print("exception $e!");
+      throw e;
+    }
+  }
+
+  //remove user data in sign out
+  @override
+  Future<void> signOut() async{
+    final prefs = await SharedPreferences.getInstance();
+    prefs.remove(key);
+  }
+
+  //save user data to preference
+  Future<void> saveUser(User user) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString(key, json.encode(user));
+  }
+
+
+}
