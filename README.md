@@ -1,16 +1,17 @@
 # flutter starter project using bloc
 
-This project is a starter bloc project using flutter_bloc package. 
+This project is a bloc project using flutter_bloc package. 
  
 ## The app include 
 - Login Page
-- Sing Up Page
+- Sign Up Page
 - Post List Page
 - Post Detail Page 
 
 ### The app use the test Apis for backend
 - For Authorization, [reqres.in] (https://reqres.in/)
 - For getting posts, [jsonplaceholder] (https://jsonplaceholder.typicode.com/)
+
 
 #### Packages usaged
 - [flutter_bloc package](https://pub.dev/packages/flutter_bloc) for state management
