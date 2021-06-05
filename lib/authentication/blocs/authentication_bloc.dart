@@ -24,16 +24,20 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
       yield* _mapUserLoggedOutToState(event);
     }
 
-    if (event is UserSignUp) {
-      yield* _mapUserSignUpToState(event);
+    if (event is UserSignedUp) {
+      yield* _mapUserSignedUpToState(event);
     }
 
-    if(event is UserSignUpClick){
-      yield* _mapUserSignUpClickToState(event);
+    if(event is LoginPageSignUpPressed){
+      yield* _mapLoginPageSignUpPressedToState(event);
     }
 
-    if(event is UserLoginClick){
-      yield* _mapUserLoginClickToState(event);
+    if(event is SignUpPageLoginPressed){
+      yield* _mapSignUpPageLoginPressedToState(event);
+    }
+
+    if(event is ExceptionOccur){
+      yield* _mapExceptionOccuredToState(event);
     }
   }
 
@@ -56,7 +60,7 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
     yield AuthenticationAuthenticated(user: event.user);
   }
 
-  Stream<AuthenticationState> _mapUserSignUpToState(UserSignUp event) async* {
+  Stream<AuthenticationState> _mapUserSignedUpToState(UserSignedUp event) async* {
     yield AuthenticationAuthenticated(user: event.user);
   }
 
@@ -65,12 +69,16 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
     yield AuthenticationNotAuthenticated();
   }
 
-  Stream<AuthenticationState> _mapUserSignUpClickToState(UserSignUpClick event) async* {
-    yield AuthenticationToSignUp();
+  Stream<AuthenticationState> _mapLoginPageSignUpPressedToState(LoginPageSignUpPressed event) async* {
+    yield RedirectToSignUpPage();
   }
 
-  Stream<AuthenticationState> _mapUserLoginClickToState(UserLoginClick event) async* {
-    yield AuthenticationToLogin();
+  Stream<AuthenticationState> _mapSignUpPageLoginPressedToState(SignUpPageLoginPressed event) async* {
+    yield RedirectToLoginPage();
+  }
+
+  Stream<AuthenticationState> _mapExceptionOccuredToState(ExceptionOccur event) async* {
+    yield AuthenticationException(event.exception);
   }
 
 }

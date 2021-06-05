@@ -1,6 +1,8 @@
 import 'package:bloc/bloc.dart';
 import 'package:formz/formz.dart';
 import 'package:starterapp/authentication/blocs/blocs.dart';
+import 'package:starterapp/authentication/models/error_response.dart';
+import 'package:starterapp/authentication/models/user.dart';
 import 'package:starterapp/authentication/repository/repository.dart';
 
 import '../signup.dart';
@@ -37,18 +39,14 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
       SignUpWithEmailButtonPressed event, SignUpState state) async* {
       if (state.status.isValidated) {
           yield state.copyWith(status: FormzStatus.submissionInProgress);
-
-          try {
-            final user = await authenticationRepository.register(state.email.value, state.password.value);
-            if (user != null) {
-              yield state.copyWith(status: FormzStatus.submissionSuccess);
-              authenticationBloc.add(UserSignUp(user: user));
-            } else {
-              print("user is empty");
-              yield state.copyWith(status: FormzStatus.submissionFailure);
-            }
-          } on Exception catch (_) {
-            yield state.copyWith(status: FormzStatus.submissionFailure);
+          final response = await authenticationRepository.register(state.email.value, state.password.value);
+          if (response is User) {
+            User user = response;
+            yield state.copyWith(status: FormzStatus.submissionSuccess);
+            authenticationBloc.add(UserSignedUp(user: user));
+          }else if(response is ErrorResponse){
+            ErrorResponse exception = response;
+            yield state.copyWith(status: FormzStatus.submissionFailure, errorMessage: exception.error);
           }
       }else{
         yield state.copyWith(status: FormzStatus.invalid);
@@ -75,6 +73,6 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
   }
 
   void _mapSignUpLoginPressedToState(SignUpLoginPressed event, SignUpState state) {
-    authenticationBloc.add(UserLoginClick());
+    authenticationBloc.add(SignUpPageLoginPressed());
   }
 }

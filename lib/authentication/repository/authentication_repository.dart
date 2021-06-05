@@ -1,14 +1,17 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'package:http/http.dart' as http;
+import 'package:starterapp/authentication/models/error_response.dart';
 import 'package:starterapp/authentication/models/models.dart';
 
 abstract class AuthenticationService {
   Future<User> getCurrentUser();
-  Future<User> login(String email, String password);
+  Future<dynamic> login(String email, String password);
   Future<void> signOut();
+  Future<dynamic> register(String email, String password);
+
 }
 
 class AuthenticationRepository extends AuthenticationService {
@@ -30,7 +33,7 @@ class AuthenticationRepository extends AuthenticationService {
 
   // make POST request to login
   @override
-  Future<User> login(String email, String password) async {
+  Future<dynamic> login(String email, String password) async {
     final uri = Uri.parse(baseUrl + '/api/login');
     var reqBody = {};
     reqBody["email"] = email;
@@ -40,11 +43,17 @@ class AuthenticationRepository extends AuthenticationService {
       print("reqBody ${reqBodyJson}");
       Response response = await http.post(uri, headers: headers, body: reqBodyJson);
       print("reponse ${response.body}");
-      final loginReponse = LoginResponse.fromJson(jsonDecode(response.body));
-      print("loginResponse ${loginReponse.toString()}");
-      User user = User(name: '-', email: email, token: loginReponse.token);
-      saveUser(user);
-      return user;
+      if(response.statusCode == 200) {
+        final loginReponse = LoginResponse.fromJson(jsonDecode(response.body));
+        print("loginResponse ${loginReponse.toString()}");
+        User user = User(name: '-', email: email, token: loginReponse.token);
+        saveUser(user);
+        return user;
+      }else{
+        final errorResponse = ErrorResponse.fromJson(jsonDecode(response.body));
+        return errorResponse;
+      }
+
     }catch(e){
       print("exception $e");
       throw e;
@@ -53,7 +62,7 @@ class AuthenticationRepository extends AuthenticationService {
 
   // make POST request to register
   @override
-  Future<User> register(String email, String password) async {
+  Future<dynamic> register(String email, String password) async {
     final registerUri = Uri.parse(baseUrl + '/api/register');
     var reqBody = {};
     reqBody["email"] = email;
@@ -63,23 +72,27 @@ class AuthenticationRepository extends AuthenticationService {
       print("reqBody ${reqBodyJson}");
       Response response = await http.post(registerUri, headers: headers, body: reqBodyJson);
       print("reponse ${response.body}");
-      final signUpReponse = SignUpResponse.fromJson(jsonDecode(response.body));
-      print("signUpResponse ${signUpReponse.toString()}");
+      if(response.statusCode == 200){
+        final signUpReponse = SignUpResponse.fromJson(jsonDecode(response.body));
+        print("signUpResponse ${signUpReponse.toString()}");
+        int userId = signUpReponse.id;
+        print("userId ${userId}");
+        final getUserUri = Uri.parse(baseUrl + '/api/users/${userId}');
+        Response rep = await http.get(getUserUri, headers: headers);
+        print("rep ${rep.body.toString()}");
+        final getUserReponse = GetUserResponse.fromJson(jsonDecode(rep.body));
+        User user = User(name: '${getUserReponse.data!.firstName} ${getUserReponse.data!.lastName}' , email:
+        '${getUserReponse.data!.email}', token: signUpReponse.token);
+        print('user $user');
+        saveUser(user);
+        return user;
+      }else{
+        final errorResponse = ErrorResponse.fromJson(jsonDecode(response.body));
+        return errorResponse;
+      }
 
-      int userId = signUpReponse.id;
-      print("userId ${userId}");
-      final getUserUri = Uri.parse(baseUrl + '/api/users/${userId}');
-      Response rep = await http.get(getUserUri, headers: headers);
-      print("rep ${rep.body.toString()}");
-      final getUserReponse = GetUserResponse.fromJson(jsonDecode(rep.body));
-      User user = User(name: '${getUserReponse.data!.firstName} ${getUserReponse.data!.lastName}' , email:
-      '${getUserReponse.data!.email}', token: signUpReponse.token);
-      print('user $user');
-      saveUser(user);
-      return user;
     }catch(e){
-      print("exception $e!");
-      throw e;
+      return ErrorResponse(error: e.toString());//get exception as error response
     }
   }
 

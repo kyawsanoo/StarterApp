@@ -22,10 +22,10 @@ class UserLoggedIn extends AuthenticationEvent {
 }
 
 // Fired when a user has successfully signed up
-class UserSignUp extends AuthenticationEvent {
+class UserSignedUp extends AuthenticationEvent {
   final User user;
 
-  UserSignUp({required this.user});
+  UserSignedUp({required this.user});
 
   @override
   List<Object> get props => [user];
@@ -34,8 +34,14 @@ class UserSignUp extends AuthenticationEvent {
 // Fired when the user has logged out
 class UserLoggedOut extends AuthenticationEvent {}
 
-// Fired when the user pressed signup
-class UserSignUpClick extends AuthenticationEvent {}
+// Fired when the user pressed signup on login page
+class LoginPageSignUpPressed extends AuthenticationEvent {}
 
-// Fired when the user pressed login
-class UserLoginClick extends AuthenticationEvent {}
+// Fired when the user pressed login on signed up page
+class SignUpPageLoginPressed extends AuthenticationEvent {}
+
+// Fired when exception occur
+class ExceptionOccur extends AuthenticationEvent {
+   String exception;
+   ExceptionOccur(this.exception);
+}

@@ -33,6 +33,11 @@ class AuthenticationFailure extends AuthenticationState {
   List<Object> get props => [message];
 }
 
-class AuthenticationToSignUp extends AuthenticationState {}
+class RedirectToSignUpPage extends AuthenticationState {}
 
-class AuthenticationToLogin extends AuthenticationState {}
+class RedirectToLoginPage extends AuthenticationState {}
+
+class AuthenticationException extends AuthenticationState {
+  String exception;
+  AuthenticationException(this.exception);
+}

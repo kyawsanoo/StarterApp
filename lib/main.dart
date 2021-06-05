@@ -86,7 +86,7 @@ class MyApp extends StatelessWidget {
                         return MyHomePage(title: "Posts");
                       }
                       // show sign up page
-                      else if(state is AuthenticationToSignUp){
+                      else if(state is RedirectToSignUpPage){
                         return SignUpPage(title: 'Create Account');
                       }
                       // otherwise show login page

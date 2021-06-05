@@ -7,9 +7,15 @@ class SignUpResponse{
   SignUpResponse({required this.id, required this.token});
 
   @override
-  String toString() => 'SignUpReponse { id: ${this.id.toString()}, token: ${this.token}}';
+  String toString() => 'SignUpReponse { id: ${this.id.toString()},'
+      ' token: ${this.token}}';
 
   factory SignUpResponse.fromJson(Map<String, dynamic> json) {
     return SignUpResponse(id: json['id'], token: json['token']);
   }
+
+  Map<String, dynamic> toJson() => {
+    'id': this.id,
+    'token': this.token,
+  };
 }

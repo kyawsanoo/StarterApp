@@ -34,8 +34,9 @@ class _SignUpPageState extends State<SignUpPage> {
             child: Container(
               alignment: Alignment.center,
               child: _SignUpForm(),
+              ),
+              //_SignUpForm(),
             )
-        )
     );
 
   }
@@ -56,11 +57,8 @@ class __SignUpFormState extends State<_SignUpForm> {
         if (state.status.isSubmissionFailure) {
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
-            ..showSnackBar(
-              const SnackBar(content: Text('Signup Failure')),
-            );
+            ..showSnackBar(SnackBar(content: Text(state.errorMessage)));
         }
-
       },
       child: BlocBuilder<SignUpBloc, SignUpState>(
         builder: (context, state) {
@@ -73,7 +71,7 @@ class __SignUpFormState extends State<_SignUpForm> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                 _EmailInput(),
+                  _EmailInput(),
                   SizedBox(
                     height: 12,
                   ),
@@ -85,9 +83,12 @@ class __SignUpFormState extends State<_SignUpForm> {
                   _SignUpButton(),
                   const SizedBox(height: 8.0),
                   const SizedBox(height: 8.0),
-                  _LoginButton()
+                  _LoginButton(),
+
                 ],
               ),
+
+
           );
         },
       ),

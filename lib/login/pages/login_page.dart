@@ -59,7 +59,7 @@ class __SignInFormState extends State<_SignInForm> {
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
             ..showSnackBar(
-              const SnackBar(content: Text('Authentication Failure')),
+              SnackBar(content: Text(state.errorMessage)),
             );
         }
       },
