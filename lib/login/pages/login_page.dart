@@ -65,11 +65,6 @@ class __SignInFormState extends State<_SignInForm> {
       },
       child: BlocBuilder<LoginBloc, LoginState>(
         builder: (context, state) {
-          if (state.status.isSubmissionInProgress) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          }
           return SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -148,7 +143,11 @@ class _LoginButton extends StatelessWidget {
     return BlocBuilder<LoginBloc, LoginState>(
       buildWhen: (previous, current) => previous.status != current.status,
       builder: (context, state) {
-        return ElevatedButton(
+        return  state.status.isSubmissionInProgress
+            ? Container(
+            child: Center(child: CircularProgressIndicator(),)
+            )
+            : ElevatedButton(
           key: const Key('loginForm_continue_raisedButton'),
           child: const Text('LOGIN'),
           onPressed: state.status.isValidated? () {
