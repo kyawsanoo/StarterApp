@@ -9,7 +9,7 @@ import 'setting_page.dart';
 class MyHomePage extends StatefulWidget {
 
   static Route route() {
-    return MaterialPageRoute<void>(builder: (_) => MyHomePage(title: "posts"));
+    return MaterialPageRoute<void>(builder: (_) => MyHomePage(title: "POSTS"));
   }
 
   MyHomePage({Key? key, this.title}) : super(key: key);
