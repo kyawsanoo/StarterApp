@@ -1,7 +1,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:starterapp/splash/splash.dart';
 import 'authentication/blocs/blocs.dart';
 import 'authentication/repository/repository.dart';
 import 'login/login.dart';
@@ -83,43 +82,32 @@ class _MyAppState extends State<MyApp>{
 
   @override
   Widget build(BuildContext context) {
-      return MaterialApp(
-          navigatorKey: _navigatorKey,
-          builder: (context, child){
-              return BlocListener<AuthenticationBloc, AuthenticationState>(
-                    listener: (context, state){
-                        if (state is AuthenticationAuthenticated) {
-                          // show home page
-                          _navigator.pushAndRemoveUntil<void>(
-                                MyHomePage.route(),
-                                    (route) => false
-                          );
 
+    return MaterialApp(
+      title: 'Starter App',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: BlocBuilder<AuthenticationBloc, AuthenticationState>(
+                builder: (context, state) {
+                      if (state is AuthenticationAuthenticated) {
+                        // show home page
+                        return MyHomePage(title: "Posts");
+                      }
+                      // show sign up page
+                      else if(state is RedirectToSignUpPage){
+                        return SignUpPage(title: 'Create Account');
+                      }
+                      // otherwise show login page
+                      else{
+                        return LoginPage(title: "Login",);
+                      }
 
-                        }
-                        // show sign up page
-                        else if(state is RedirectToSignUpPage){
-                          _navigator.pushAndRemoveUntil<void>(
-                              SignUpPage.route(),
-                              (route) => false
-                          );
-
-                        }
-                        // otherwise show login page
-                        else{
-                          _navigator.pushAndRemoveUntil<void>(
-                              LoginPage.route(),
-                                  (route) => false
-                          );                        }
-                     },
-                     child: child,
-              );
-          },
-          onGenerateRoute: (_) => SplashPage.route(),
+                  }
+      )
       );
 
+    }
   }
-
-}
 
 

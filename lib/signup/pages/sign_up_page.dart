@@ -9,7 +9,7 @@ class SignUpPage extends StatefulWidget {
   SignUpPage({required this.title});
 
   static Route route() {
-    return MaterialPageRoute<void>(builder: (_) => SignUpPage(title: 'CREATE ACCOUNT'));
+    return MaterialPageRoute<void>(builder: (_) => SignUpPage(title: 'Create Account'));
   }
 
   @override

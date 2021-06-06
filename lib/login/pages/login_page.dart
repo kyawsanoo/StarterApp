@@ -11,7 +11,7 @@ class LoginPage extends StatefulWidget {
   LoginPage({required this.title});
 
   static Route route() {
-    return MaterialPageRoute<void>(builder: (_) => LoginPage(title: 'LOGIN'));
+    return MaterialPageRoute<void>(builder: (_) => LoginPage(title: 'Login'));
   }
 
   @override
