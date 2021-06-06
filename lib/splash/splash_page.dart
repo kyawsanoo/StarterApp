@@ -12,6 +12,8 @@ class SplashPage extends StatefulWidget {
 }
 
 class _SplashState extends State<SplashPage>{
+
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -20,4 +22,8 @@ class _SplashState extends State<SplashPage>{
     );
   }
 
+  @override
+  void initState() {
+
+  }
 }

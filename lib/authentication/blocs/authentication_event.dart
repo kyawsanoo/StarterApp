@@ -42,6 +42,10 @@ class SignUpPageLoginPressed extends AuthenticationEvent {}
 
 // Fired when exception occur
 class ExceptionOccur extends AuthenticationEvent {
-   String exception;
-   ExceptionOccur(this.exception);
+   String? exception;
+   ExceptionOccur([this.exception]);
+
+   @override
+   List<Object> get props => [exception!];
+
 }

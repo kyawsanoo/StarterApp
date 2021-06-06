@@ -15,44 +15,36 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
     if (event is AppLoaded) {
       yield* _mapAppLoadedToState(event);
     }
-
-    if (event is UserLoggedIn) {
+    else if (event is UserLoggedIn) {
       yield* _mapUserLoggedInToState(event);
     }
-
-    if (event is UserLoggedOut) {
+    else if (event is UserLoggedOut) {
       yield* _mapUserLoggedOutToState(event);
     }
-
-    if (event is UserSignedUp) {
+    else if (event is UserSignedUp) {
       yield* _mapUserSignedUpToState(event);
     }
-
-    if(event is LoginPageSignUpPressed){
+    else if(event is LoginPageSignUpPressed){
       yield* _mapLoginPageSignUpPressedToState(event);
     }
-
-    if(event is SignUpPageLoginPressed){
+    else if(event is SignUpPageLoginPressed){
       yield* _mapSignUpPageLoginPressedToState(event);
     }
-
-    if(event is ExceptionOccur){
-      yield* _mapExceptionOccuredToState(event);
+    else if(event is ExceptionOccur){
+      yield* _mapExceptionOccurredToState(event);
     }
   }
 
   Stream<AuthenticationState> _mapAppLoadedToState(AppLoaded event) async* {
-    yield AuthenticationLoading();
     try {
       final currentUser = await repository.getCurrentUser();
-
       if (currentUser!= null) {
         yield AuthenticationAuthenticated(user: currentUser);
       } else {
         yield AuthenticationNotAuthenticated();
       }
     } catch (e) {
-      yield AuthenticationFailure(message:  'An unknown error occurred');
+      yield AuthenticationFailure(message:  e.toString());
     }
   }
 
@@ -77,8 +69,8 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
     yield RedirectToLoginPage();
   }
 
-  Stream<AuthenticationState> _mapExceptionOccuredToState(ExceptionOccur event) async* {
-    yield AuthenticationException(event.exception);
+  Stream<AuthenticationState>_mapExceptionOccurredToState(ExceptionOccur event) async* {
+    yield AuthenticationFailure(message: event.exception);
+    yield AuthenticationNotAuthenticated();
   }
-
 }

@@ -18,7 +18,6 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
 
   @override
   Stream<SignUpState> mapEventToState(SignUpEvent event) async* {
-
     if(event is SignUpEmailChanged){
       yield _mapSignUpEmailChangedToEvent(event, state);
     }
@@ -28,11 +27,9 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
     else if (event is SignUpWithEmailButtonPressed) {
       yield* _mapSignUpWithEmailToState(event, state);
     }
-
     else if (event is SignUpLoginPressed){
       _mapSignUpLoginPressedToState(event, state);
     }
-
   }
 
   Stream<SignUpState> _mapSignUpWithEmailToState(
@@ -45,16 +42,18 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
             yield state.copyWith(status: FormzStatus.submissionSuccess);
             authenticationBloc.add(UserSignedUp(user: user));
           }else if(response is ErrorResponse){
-            ErrorResponse exception = response;
-            yield state.copyWith(status: FormzStatus.submissionFailure, errorMessage: exception.error);
+            ErrorResponse errorResponse = response;
+            yield state.copyWith(status: FormzStatus.submissionFailure, errorMessage: errorResponse.error);
+            authenticationBloc.add(ExceptionOccur(errorResponse.error));
           }
       }else{
         yield state.copyWith(status: FormzStatus.invalid);
+        authenticationBloc.add(ExceptionOccur());
       }
   }
 
   SignUpState _mapSignUpEmailChangedToEvent(
-      SignUpEmailChanged event, SignUpState state)  {
+    SignUpEmailChanged event, SignUpState state)  {
     final email = Email.dirty(event.email);
     return state.copyWith(
       email: email,
@@ -64,7 +63,7 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
 
 
   SignUpState _mapSignUpPasswordChangedToEvent(
-      SignUpPasswordChanged event, SignUpState state)  {
+    SignUpPasswordChanged event, SignUpState state)  {
     final password = Password.dirty(event.password);
     return state.copyWith(
         password: password,

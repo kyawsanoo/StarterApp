@@ -11,7 +11,8 @@ abstract class AuthenticationState extends Equatable {
 
 class AuthenticationInitial extends AuthenticationState {}
 
-class AuthenticationLoading extends AuthenticationState {}
+class AuthenticationLoading extends AuthenticationState {
+}
 
 class AuthenticationNotAuthenticated extends AuthenticationState {}
 
@@ -25,19 +26,15 @@ class AuthenticationAuthenticated extends AuthenticationState {
 }
 
 class AuthenticationFailure extends AuthenticationState {
-  final String message;
+  final String? message;
 
-  AuthenticationFailure({required this.message});
+  AuthenticationFailure({this.message});
 
   @override
-  List<Object> get props => [message];
+  List<Object> get props => [message!];
 }
 
 class RedirectToSignUpPage extends AuthenticationState {}
 
 class RedirectToLoginPage extends AuthenticationState {}
 
-class AuthenticationException extends AuthenticationState {
-  String exception;
-  AuthenticationException(this.exception);
-}

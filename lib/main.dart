@@ -91,9 +91,10 @@ class _MyAppState extends State<MyApp>{
                         if (state is AuthenticationAuthenticated) {
                           // show home page
                           _navigator.pushAndRemoveUntil<void>(
-                              MyHomePage.route(),
-                              (route) => false
+                                MyHomePage.route(),
+                                    (route) => false
                           );
+
 
                         }
                         // show sign up page
@@ -108,11 +109,8 @@ class _MyAppState extends State<MyApp>{
                         else{
                           _navigator.pushAndRemoveUntil<void>(
                               LoginPage.route(),
-                              (route) => false
-                          );
-
-                        }
-
+                                  (route) => false
+                          );                        }
                      },
                      child: child,
               );

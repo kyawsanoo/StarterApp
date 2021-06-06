@@ -7,7 +7,7 @@ import 'package:starterapp/authentication/models/error_response.dart';
 import 'package:starterapp/authentication/models/models.dart';
 
 abstract class AuthenticationService {
-  Future<User> getCurrentUser();
+  Future<User?> getCurrentUser();
   Future<dynamic> login(String email, String password);
   Future<void> signOut();
   Future<dynamic> register(String email, String password);
@@ -22,13 +22,17 @@ class AuthenticationRepository extends AuthenticationService {
 
   //get user data from preference
   @override
-  Future<User> getCurrentUser() async {
+  Future<User?> getCurrentUser() async {
     final prefs = await SharedPreferences.getInstance();
     String? userString = prefs.getString(key);
-    Map<String, dynamic> userMap =  (userString !=null)? json.decode(userString) : null;
-    User user = User.fromJson(userMap);
-    print('currentUser $user!');
-    return user;
+    Map<String, dynamic> userMapString =  (userString !=null)? json.decode(userString) : null;
+    User? user ;
+    return Future.delayed(Duration(seconds: 5),//for splash page show time
+        () {
+          print('currentUser $user!');
+          user =  User.fromJson(userMapString);
+        }
+    );
   }
 
   // make POST request to login

@@ -46,9 +46,11 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
           }else{
             ErrorResponse errorResponse = response;
             yield state.copyWith(status: FormzStatus.submissionFailure, errorMessage: errorResponse.error);
+            authenticationBloc.add(ExceptionOccur(errorResponse.error));
           }
       }else{
         yield state.copyWith(status: FormzStatus.invalid);
+        authenticationBloc.add(ExceptionOccur());
       }
   }
 
