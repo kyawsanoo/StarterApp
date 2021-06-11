@@ -134,23 +134,23 @@ class _MyAppState extends State<MyApp> {
                 buildWhen: (previousState, currentState) =>
                 previousState != currentState,
                 builder: (_, localeState) {
-            return MaterialApp(
-                title: 'Starter App',
-                theme: ThemeData(
-                  primarySwatch: Colors.blue,
-                ),
-                supportedLocales: AppLocalizationsSetup.supportedLocales,
-                localizationsDelegates: AppLocalizationsSetup.localizationsDelegates,
-                localeResolutionCallback: AppLocalizationsSetup
-                    .localeResolutionCallback,
-                // Each time a new state emitted, the app will be rebuilt with the new
-                // locale.
-                locale: localeState.locale,
-                home: LoginPage()
-            );
+                  return MaterialApp(
+                      title: 'Starter App',
+                      theme: ThemeData(
+                        primarySwatch: Colors.blue,
+                      ),
+                      supportedLocales: AppLocalizationsSetup.supportedLocales,
+                      localizationsDelegates: AppLocalizationsSetup.localizationsDelegates,
+                      localeResolutionCallback: AppLocalizationsSetup
+                          .localeResolutionCallback,
+                      // Each time a new state emitted, the app will be rebuilt with the new
+                      // locale.
+                      locale: localeState.locale,
+                      home: LoginPage()
+                  );
 
-                }
-            );
+                      }
+                );
           }
         }
 
@@ -159,88 +159,5 @@ class _MyAppState extends State<MyApp> {
   }
 
 }
-    /*BlocBuilder<LocaleBloc, LocaleState>(
-          buildWhen: (previousState, currentState) => previousState != currentState,
-          builder: (_, localeState) {
-            return MaterialApp(
-                  title: 'Starter App',
-                  theme: ThemeData(
-                    primarySwatch: Colors.blue,
-                  ),
-                  supportedLocales: AppLocalizationsSetup.supportedLocales,
-                  localizationsDelegates: AppLocalizationsSetup.localizationsDelegates,
-                  localeResolutionCallback: AppLocalizationsSetup
-                      .localeResolutionCallback,
-                  // Each time a new state emitted, the app will be rebuilt with the new
-                  // locale.
-                  locale: localeState.locale,
-                  home: MyHomePage(title: "Posts")
-                  *//*BlocBuilder<AuthenticationBloc, AuthenticationState>(
-                      builder: (context, state) {
-                        if (state is AuthenticationAuthenticated) {
-                          // show home page
-                          return MyHomePage(title: "Posts");
-                        }
-                        // show sign up page
-                        else if (state is RedirectToSignUpPage) {
-                          return SignUpPage(title: 'Create Account');
-                        }
-                        // otherwise show login page
-                        else {
-                          return LoginPage();
-                        }
-                      }
-                  )*//*
-              );
-          }
-      );
-*/
-
-
-
-
-
-
-
-      /*BlocBuilder<LocaleBloc, LocaleState>(
-    buildWhen: (previousState, currentState) => previousState != currentState,
-    builder: (_, localeState) {
-
-      return
-        MaterialApp(
-          title: 'Starter App',
-          theme: ThemeData(
-            primarySwatch: Colors.blue,
-          ),
-          supportedLocales: AppLocalizationsSetup.supportedLocales,
-          localizationsDelegates: AppLocalizationsSetup.localizationsDelegates,
-          localeResolutionCallback: AppLocalizationsSetup
-              .localeResolutionCallback,
-          // Each time a new state emitted, the app will be rebuilt with the new
-          // locale.
-          locale: localeState.locale,
-          home:
-          BlocBuilder<AuthenticationBloc, AuthenticationState>(
-              builder: (context, state) {
-                if (state is AuthenticationAuthenticated) {
-                  // show home page
-                  return MyHomePage(title: "Posts");
-                }
-                // show sign up page
-                else if (state is RedirectToSignUpPage) {
-                  return SignUpPage(title: 'Create Account');
-                }
-                // otherwise show login page
-                else {
-                  return LoginPage();
-                }
-              }
-          )
-      );
-    }
-    );*/
-
-
-
 
 
