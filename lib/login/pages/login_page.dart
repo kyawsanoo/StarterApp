@@ -1,44 +1,61 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
+import 'package:starterapp/localization/localization.dart';
 
 import '../login.dart';
 
 class LoginPage extends StatefulWidget {
 
-  String title;
 
-  LoginPage({required this.title});
+  LoginPage();
 
   static Route route() {
-    return MaterialPageRoute<void>(builder: (_) => LoginPage(title: 'Login'));
+    return MaterialPageRoute<void>(builder: (_) => LoginPage());
   }
 
   @override
   _LoginPageState createState() {
-    return _LoginPageState(this.title);
+    return _LoginPageState();
   }
 
 }
 
 class _LoginPageState extends State<LoginPage>{
-  final String title;
 
-  _LoginPageState(this.title);
+  _LoginPageState();
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text(this.title),
-        ),
-        body: SafeArea(
-            minimum: const EdgeInsets.all(16),
-            child: Container(
-              alignment: Alignment.center,
-              child: _SignInForm(),
-            )
-        )
+    return BlocListener<LocaleBloc, LocaleState>(
+       listener: (context, state) {
+         print('current locale ${state.locale}');
+       },
+       child: BlocBuilder<LocaleBloc, LocaleState>(
+         builder: (context, state){
+           return Scaffold(
+               appBar: AppBar(
+                 title: Text(AppLocalizations.of(context).translate('login'), style: TextStyle(fontSize: 16,)),
+                 actions: [
+                   IconButton(
+                     icon: Image.asset(AppLocalizations.of(context).isEnLocale? "assets/images/language.png" : "assets/images/myanmar_lan.png",  width: 20, height: 20,),
+                     onPressed: () async {
+                       context.read<LocaleBloc>().add(ToggleLanguage(newLanguage: AppLocalizations.of(context).isEnLocale? 'my' : 'en'));
+                     },
+                   ),
+
+                 ],
+               ),
+               body: SafeArea(
+                   minimum: const EdgeInsets.all(16),
+                   child: Container(
+                     alignment: Alignment.center,
+                     child: _SignInForm(),
+                   )
+               )
+           );
+         },
+       )
     );
 
   }
@@ -103,9 +120,9 @@ class _EmailInput extends StatelessWidget {
               context.read<LoginBloc>().add(LoginEmailChanged(password)),
           obscureText: false,
           decoration: InputDecoration(
-            labelText: 'email',
+            labelText: AppLocalizations.of(context).translate('email'),
             helperText: '',
-            errorText: state.email.invalid ? 'invalid email' : null,
+            errorText: state.email.invalid ? AppLocalizations.of(context).translate('invalid_email') : null,
           ),
         );
       },
@@ -126,9 +143,9 @@ class _PasswordInput extends StatelessWidget {
               context.read<LoginBloc>().add(LoginPasswordChanged(password)),
           obscureText: true,
           decoration: InputDecoration(
-            labelText: 'password',
+            labelText: AppLocalizations.of(context).translate('password'),
             helperText: '',
-            errorText: state.password.invalid ? 'invalid password' : null,
+            errorText: state.password.invalid ? AppLocalizations.of(context).translate('invalid_password') : null,
           ),
         );
       },
@@ -149,7 +166,7 @@ class _LoginButton extends StatelessWidget {
             )
             : ElevatedButton(
           key: const Key('loginForm_continue_raisedButton'),
-          child: const Text('LOGIN'),
+          child: Text(AppLocalizations.of(context).translate('login_btn')),
           onPressed: state.status.isValidated? () {
             context.read<LoginBloc>().add(LoginInWithEmailButtonPressed());
           }
@@ -169,7 +186,7 @@ class _SignUpButton extends StatelessWidget {
       key: const Key('loginForm_createAccount_flatButton'),
       onPressed: () => loginBloc.add(SignUpButtonPressed()),
       child: Text(
-        'CREATE ACCOUNT',
+        AppLocalizations.of(context).translate('create_account'),
         style: TextStyle(color: theme.primaryColor),
 
       ),

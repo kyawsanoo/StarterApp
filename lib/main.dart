@@ -3,13 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'authentication/blocs/blocs.dart';
 import 'authentication/repository/repository.dart';
+import 'localization/localization.dart';
 import 'login/login.dart';
 import 'posts/cubits/cubits.dart';
 import 'posts/posts.dart';
 import 'signup/blocs/blocs.dart';
 import 'signup/signup.dart';
 
-void main() {
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
 
   runApp(
     MultiRepositoryProvider(
@@ -60,6 +62,9 @@ void main() {
                         return PostCubit(repository: postRepository);
                       }
                     ),
+                    BlocProvider<LocaleBloc>(
+                        create: (context) => LocaleBloc()..add(LanguageLoadStarted())
+                    ),
                   ],
                   child: MyApp(),
               ),
@@ -82,30 +87,41 @@ class _MyAppState extends State<MyApp>{
 
   @override
   Widget build(BuildContext context) {
+    return BlocBuilder<LocaleBloc, LocaleState>(
+    buildWhen: (previousState, currentState) => previousState != currentState,
+    builder: (_, localeState) {
 
-    return MaterialApp(
-      title: 'Starter App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: BlocBuilder<AuthenticationBloc, AuthenticationState>(
-                builder: (context, state) {
-                      if (state is AuthenticationAuthenticated) {
-                        // show home page
-                        return MyHomePage(title: "Posts");
-                      }
-                      // show sign up page
-                      else if(state is RedirectToSignUpPage){
-                        return SignUpPage(title: 'Create Account');
-                      }
-                      // otherwise show login page
-                      else{
-                        return LoginPage(title: "Login",);
-                      }
-
-                  }
-      )
+      return MaterialApp(
+          title: 'Starter App',
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+          ),
+          supportedLocales: AppLocalizationsSetup.supportedLocales,
+          localizationsDelegates: AppLocalizationsSetup.localizationsDelegates,
+          localeResolutionCallback: AppLocalizationsSetup
+              .localeResolutionCallback,
+          // Each time a new state emitted, the app will be rebuilt with the new
+          // locale.
+          locale: localeState.locale,
+          home: BlocBuilder<AuthenticationBloc, AuthenticationState>(
+              builder: (context, state) {
+                if (state is AuthenticationAuthenticated) {
+                  // show home page
+                  return MyHomePage(title: "Posts");
+                }
+                // show sign up page
+                else if (state is RedirectToSignUpPage) {
+                  return SignUpPage(title: 'Create Account');
+                }
+                // otherwise show login page
+                else {
+                  return LoginPage();
+                }
+              }
+          )
       );
+    }
+    );
 
     }
   }

@@ -29,7 +29,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       yield* _mapLoginWithEmailToState(event, state);
     }
     else if(event is SignUpButtonPressed){
-       _mapSignUpButtonClickToState(event, state);
+      _mapSignUpButtonClickToState(event, state);
     }
 
   }

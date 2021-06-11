@@ -1,0 +1,12 @@
+{
+  "login": "LOGIN",
+  "email": "email",
+  "invalid_email" : "invalid email",
+  "password": "password",
+  "invalid_password": "invalid password",
+  "login_btn": "LOGIN",
+  "create_account": "CREATE ACCOUNT",
+  "sign_up": "SIGN UP",
+  "sign_up_btn": "SIGN UP"
+
+}
