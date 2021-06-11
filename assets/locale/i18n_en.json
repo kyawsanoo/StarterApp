@@ -7,6 +7,7 @@
   "login_btn": "LOGIN",
   "create_account": "CREATE ACCOUNT",
   "sign_up": "SIGN UP",
-  "sign_up_btn": "SIGN UP"
-
+  "sign_up_btn": "SIGN UP",
+  "posts": "Posts",
+  "post_detail": "Post Detail"
 }

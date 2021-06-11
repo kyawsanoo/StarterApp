@@ -26,13 +26,8 @@ class AuthenticationRepository extends AuthenticationService {
     final prefs = await SharedPreferences.getInstance();
     String? userString = prefs.getString(key);
     Map<String, dynamic> userMapString =  (userString !=null)? json.decode(userString) : null;
-    User? user ;
-    return Future.delayed(Duration(seconds: 5),//for splash page show time
-        () {
-          print('currentUser $user!');
-          user =  User.fromJson(userMapString);
-        }
-    );
+    return User.fromJson(userMapString);
+
   }
 
   // make POST request to login

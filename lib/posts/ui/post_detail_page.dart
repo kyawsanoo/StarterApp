@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:starterapp/localization/localization.dart';
 import 'package:starterapp/posts/posts.dart';
 
 
@@ -36,7 +37,8 @@ class _PostDetailPageState extends State<PostDetailPage>{
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("post detail"),),
+        title: Text(AppLocalizations.of(context).translate("post_detail"), style: TextStyle(fontSize: 16,)),
+      ),
 
       body: BlocBuilder<PostCubit, PostState>(
         builder: (context, state) {

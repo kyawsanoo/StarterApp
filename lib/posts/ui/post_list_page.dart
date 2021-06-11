@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:starterapp/authentication/blocs/blocs.dart';
+import 'package:starterapp/localization/app_localizations.dart';
 import 'package:starterapp/posts/posts.dart';
 import 'post_detail_page.dart';
 import 'setting_page.dart';
@@ -33,7 +34,7 @@ class _MyHomePageState extends State<MyHomePage> {
     AuthenticationBloc authenticationBloc = BlocProvider.of<AuthenticationBloc>(context);
     return Scaffold(
         appBar: AppBar(
-          title: Text(widget.title!),
+          title: Text(AppLocalizations.of(context).translate("posts"), style: TextStyle(fontSize: 16,)),
           actions: <Widget>[
             IconButton(
               icon: Icon(
@@ -85,11 +86,6 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  _navigateToSettingPage (BuildContext context){
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => SettingPage()),
-    );
-  }
+
 }
 
