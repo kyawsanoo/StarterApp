@@ -49,3 +49,4 @@ app.*.map.json
 /.metadata
 /.flutter-plugins-dependencies
 /.flutter-plugins
+/android/settings_aar.gradle
