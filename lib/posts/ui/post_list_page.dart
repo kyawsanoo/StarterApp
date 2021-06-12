@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:starterapp/authentication/blocs/blocs.dart';
 import 'package:starterapp/localization/app_localizations.dart';
+import 'package:starterapp/localization/localization.dart';
 import 'package:starterapp/posts/posts.dart';
 import 'post_detail_page.dart';
 import 'setting_page.dart';
@@ -36,6 +37,12 @@ class _MyHomePageState extends State<MyHomePage> {
         appBar: AppBar(
           title: Text(AppLocalizations.of(context).translate("posts"), style: TextStyle(fontSize: 16,)),
           actions: <Widget>[
+            IconButton(
+              icon: Image.asset(AppLocalizations.of(context).isEnLocale? "assets/images/language.png" : "assets/images/myanmar_lan.png",  width: 20, height: 20,),
+              onPressed: () async {
+                context.read<LocaleBloc>().add(ToggleLanguage(newLanguage: AppLocalizations.of(context).isEnLocale? 'my' : 'en'));
+              },
+            ),
             IconButton(
               icon: Icon(
                 Icons.logout,
