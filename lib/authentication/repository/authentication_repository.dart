@@ -45,7 +45,7 @@ class AuthenticationRepository extends AuthenticationService {
       if(response.statusCode == 200) {
         final loginReponse = LoginResponse.fromJson(jsonDecode(response.body));
         print("loginResponse ${loginReponse.toString()}");
-        User user = User(name: '-', email: email, token: loginReponse.token);
+        User user = User(name: 'Mr Eve Holt', email: email, token: loginReponse.token);
         saveUser(user);
         return user;
       }else{

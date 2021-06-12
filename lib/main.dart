@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:starterapp/posts/navdrawer/nav_drawer_bloc.dart';
 import 'authentication/blocs/blocs.dart';
 import 'authentication/repository/repository.dart';
 import 'localization/localization.dart';
@@ -64,6 +65,10 @@ void main() async{
                     ),
                     BlocProvider<LocaleBloc>(
                         create: (context) => LocaleBloc()..add(LanguageLoadStarted())
+                    ),
+
+                    BlocProvider<NavDrawerBloc>(
+                        create: (context) => NavDrawerBloc()
                     ),
                   ],
                   child: MyApp(),

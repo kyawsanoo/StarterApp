@@ -8,9 +8,11 @@ This project is a bloc project using flutter_bloc package.
 - Sign Up Bloc for user sign up
 - Post List Cubit for getting user post
 - Post Detail Cubit for getting user post detail 
-- form validation
-- controls http success and error response
+- Navigation Drawer Bloc
+- Form validation
+- Controls http success and error response
 - Store user information and app changed language in preference
+
 
 ### The app use the test Apis for backend
 - For Authorization, [reqres.in] (https://reqres.in/)
