@@ -1,15 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:starterapp/authentication/blocs/blocs.dart';
-import 'package:starterapp/localization/app_localizations.dart';
+import 'package:starterapp/authentication/authentication.dart';
 import 'package:starterapp/localization/localization.dart';
-import 'package:starterapp/posts/navdrawer/nav_drawer_bloc.dart';
-import 'package:starterapp/posts/navdrawer/nav_drawer_event.dart';
-import 'package:starterapp/posts/navdrawer/nav_drawer_state.dart';
 import 'package:starterapp/posts/posts.dart';
 import 'post_detail_page.dart';
-import 'setting_page.dart';
 
 class MyHomePage extends StatefulWidget {
 
