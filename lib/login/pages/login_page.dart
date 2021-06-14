@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
 import 'package:starterapp/localization/localization.dart';
+import 'package:starterapp/themes/themes.dart';
 
 import '../login.dart';
 
@@ -22,8 +23,18 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage>{
+  late bool _isDarkTheme;
+  late ThemeBloc _themeBloc;
 
   _LoginPageState();
+
+
+  @override
+  void initState() {
+    super.initState();
+    _isDarkTheme = false;
+    _themeBloc = BlocProvider.of<ThemeBloc>(context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +54,24 @@ class _LoginPageState extends State<LoginPage>{
                        context.read<LocaleBloc>().add(ToggleLanguage(newLanguage: AppLocalizations.of(context).isEnLocale? 'my' : 'en'));
                      },
                    ),
+                   BlocBuilder<ThemeBloc, ThemeState>(
+                       builder: (_, themeState){
+                         return Switch(
+                           value: _isDarkTheme,
+                           onChanged: (value) {
+                             _isDarkTheme = value;
+                             print("isDarkTheme $_isDarkTheme");
+                             if(_isDarkTheme){
+                               _themeBloc.add(ThemeEvent(appTheme: AppTheme.darkTheme));
+                             }else{
+                               _themeBloc.add(ThemeEvent(appTheme: AppTheme.lightTheme));
+                             }
+                           },
+                           activeTrackColor: Theme.of(context).textTheme.bodyText1!.color,
+                           activeColor: Theme.of(context).primaryColorDark,
+                         );
+
+                       })
 
                  ],
                ),
@@ -116,13 +145,25 @@ class _EmailInput extends StatelessWidget {
       builder: (context, state) {
         return TextField(
           key: const Key('loginForm_emailInput_textField'),
+          style: Theme.of(context).textTheme.bodyText1,
           onChanged: (password) =>
               context.read<LoginBloc>().add(LoginEmailChanged(password)),
           obscureText: false,
           decoration: InputDecoration(
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Theme.of(context).textTheme.bodyText1!.color!),
+            ),
+            focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Theme.of(context).textTheme.bodyText1!.color!),
+            ),
+            border: UnderlineInputBorder(
+              borderSide: BorderSide(color: Theme.of(context).textTheme.bodyText1!.color!),
+            ),
             labelText: AppLocalizations.of(context).translate('email'),
+            labelStyle: Theme.of(context).textTheme.bodyText1,
             helperText: '',
             errorText: state.email.invalid ? AppLocalizations.of(context).translate('invalid_email') : null,
+            errorStyle: Theme.of(context).textTheme.bodyText1,
           ),
         );
       },
@@ -139,13 +180,25 @@ class _PasswordInput extends StatelessWidget {
       builder: (context, state) {
         return TextField(
           key: const Key('loginForm_passwordInput_textField'),
+          style: Theme.of(context).textTheme.bodyText1,
           onChanged: (password) =>
               context.read<LoginBloc>().add(LoginPasswordChanged(password)),
           obscureText: true,
           decoration: InputDecoration(
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Theme.of(context).textTheme.bodyText1!.color!),
+            ),
+            focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Theme.of(context).textTheme.bodyText1!.color!),
+            ),
+            border: UnderlineInputBorder(
+              borderSide: BorderSide(color: Theme.of(context).textTheme.bodyText1!.color!),
+            ),
             labelText: AppLocalizations.of(context).translate('password'),
+            labelStyle: Theme.of(context).textTheme.bodyText1,
             helperText: '',
             errorText: state.password.invalid ? AppLocalizations.of(context).translate('invalid_password') : null,
+            errorStyle: Theme.of(context).textTheme.bodyText1,
           ),
         );
       },
@@ -166,7 +219,14 @@ class _LoginButton extends StatelessWidget {
             )
             : ElevatedButton(
           key: const Key('loginForm_continue_raisedButton'),
-          child: Text(AppLocalizations.of(context).translate('login_btn')),
+          style: ElevatedButton.styleFrom(
+              primary: Theme.of(context).textTheme.bodyText1!.color,
+              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+              textStyle: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.normal)),
+          child: Text(AppLocalizations.of(context).translate('login_btn'),
+            style: TextStyle(color: Theme.of(context).textTheme.bodyText1!.color),),
           onPressed: state.status.isValidated? () {
             context.read<LoginBloc>().add(LoginInWithEmailButtonPressed());
           }
@@ -187,7 +247,7 @@ class _SignUpButton extends StatelessWidget {
       onPressed: () => loginBloc.add(SignUpButtonPressed()),
       child: Text(
         AppLocalizations.of(context).translate('create_account'),
-        style: TextStyle(color: theme.primaryColor),
+        style: TextStyle(color: theme.textTheme.bodyText1!.color),
 
       ),
     );

@@ -4,7 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:starterapp/authentication/authentication.dart';
 import 'package:starterapp/localization/localization.dart';
 import 'package:starterapp/posts/posts.dart';
+import 'package:starterapp/themes/themes.dart';
 import 'post_detail_page.dart';
+late AuthenticationBloc _authenticationBloc;
 
 class MyHomePage extends StatefulWidget {
 
@@ -21,20 +23,24 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  late NavDrawerBloc _bloc;
+  late NavDrawerBloc _navDrawerBloc;
+  late ThemeBloc _themeBloc;
   late Widget _content;
-  
+  bool isDarkTheme = false;
+
   @override
   void initState() {
     super.initState();
+
     BlocProvider.of<PostListCubit>(context)..fetchPostList();
-    _bloc = BlocProvider.of<NavDrawerBloc>(context);
-    _content = _getContentForState(_bloc.state);
+    _themeBloc = BlocProvider.of<ThemeBloc>(context);
+    _navDrawerBloc = BlocProvider.of<NavDrawerBloc>(context);
+    _content = _getContentForState(_navDrawerBloc.state);
+    _authenticationBloc = BlocProvider.of<AuthenticationBloc>(context);
   }
 
   @override
   Widget build(BuildContext context) {
-    AuthenticationBloc authenticationBloc = BlocProvider.of<AuthenticationBloc>(context);
     return
       BlocListener<NavDrawerBloc, NavDrawerState>(
             listener: (BuildContext context, NavDrawerState state) {
@@ -64,17 +70,25 @@ class _MyHomePageState extends State<MyHomePage> {
                           context.read<LocaleBloc>().add(ToggleLanguage(newLanguage: AppLocalizations.of(context).isEnLocale? 'my' : 'en'));
                         },
                       ),
-                      IconButton(
-                        icon: Icon(
-                          Icons.logout,
-                          color: Colors.white,
-                        ),
-                        onPressed: () {
-                          // do something
-                          authenticationBloc.add(UserLoggedOut());
-                        },
-                      )
-                    ],
+                      BlocBuilder<ThemeBloc, ThemeState>(
+                          builder: (_, themeState){
+                            return Switch(
+                              value: isDarkTheme,
+                              onChanged: (value) {
+                                  isDarkTheme = value;
+                                  print("isDarkTheme $isDarkTheme");
+                                  if(isDarkTheme){
+                                    _themeBloc.add(ThemeEvent(appTheme: AppTheme.darkTheme));
+                                  }else{
+                                    _themeBloc.add(ThemeEvent(appTheme: AppTheme.lightTheme));
+                                  }
+                              },
+                              activeTrackColor: Theme.of(context).textTheme.bodyText1!.color,
+                              activeColor: Theme.of(context).primaryColorDark,
+                            );
+
+                          })
+                                          ],
                   ),
                   body: AnimatedSwitcher(
                     switchInCurve: Curves.easeInExpo,
@@ -113,10 +127,12 @@ class _MyHomePageState extends State<MyHomePage> {
                                 itemBuilder: (context, index) {
                                   Post post = postList[index];
                                   print("post ${post.toString()}");
-                                  return ListTile(title: Text(post.title),
-                                      onTap: () =>
-                                          _navigateToPostDetailPage(
-                                              context, post.id.toString()));
+                                  return ListTile(title: Text(post.title,
+                                      style: TextStyle(fontSize: 14, color: Theme.of(context).textTheme.bodyText1!.color)
+                                                          ),
+                                                  onTap: () =>
+                                                      _navigateToPostDetailPage(context, post.id.toString())
+                                  );
                                 }
                             ));
                       }
@@ -131,13 +147,18 @@ class _MyHomePageState extends State<MyHomePage> {
     }else if(state.selectedItem == NavItem.page_two){
       return BlocBuilder<LocaleBloc, LocaleState>(
           builder: (context, state) {
-            return Center(child: Text(AppLocalizations.of(context).translate("inbox")));
+            return Center(child: Text(AppLocalizations.of(context).translate("inbox"),
+                style: TextStyle(fontSize: 14, color: Theme.of(context).textTheme.bodyText1!.color))
+            );
           }
       ) ;
     }else{
       return BlocBuilder<LocaleBloc, LocaleState>(
           builder: (context, state) {
-            return Center(child: Text(AppLocalizations.of(context).translate("about_us")));
+            return Center(child: Text(AppLocalizations.of(context).translate("about_us"),
+                style: TextStyle(fontSize: 14, color: Theme.of(context).textTheme.bodyText1!.color)
+            )
+            );
           }
       ) ;
     }
@@ -177,46 +198,55 @@ class NavDrawerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Drawer(
-    // Add a ListView to the drawer. This ensures the user can scroll
-    // through the options in the drawer if there isn't enough vertical
-    // space to fit everything.
       child: Container(
-        color: Colors.white54,
+        color: Theme.of(context).backgroundColor,
         child: ListView.builder(
             padding: EdgeInsets.zero,
             itemCount: getListItems(context).length,
             itemBuilder: (BuildContext context, int index) =>
                 BlocBuilder<NavDrawerBloc, NavDrawerState>(
                   builder: (BuildContext context, NavDrawerState state) =>
-                      _buildItem(getListItems(context)[index], state),
+                      _buildItem(context, getListItems(context)[index], state),
                 )),
       )
   );
 
-  Widget _buildItem(_NavigationItem data, NavDrawerState state) => data.header
-  // if the item is a header return the header widget
-      ? _makeHeaderItem()
-  // otherwise build and return the default list item
-      : _makeListItem(data, state);
+  Widget _buildItem(BuildContext context, _NavigationItem data, NavDrawerState state) => data.header
+      ? _makeHeaderItem(context)
+      : _makeListItem(context, data, state);
 
-  Widget _makeHeaderItem() => UserAccountsDrawerHeader(
+  Widget _makeHeaderItem(BuildContext context) => UserAccountsDrawerHeader(
     accountName: Text(accountName, style: TextStyle(color: Colors.white)),
-    accountEmail: Text(accountEmail, style: TextStyle(color: Colors.white)),
-    decoration: BoxDecoration(color: Colors.blue),
-    currentAccountPicture: CircleAvatar(
-      backgroundColor: Colors.white,
-      foregroundColor: Colors.black12,
-      child: Icon(
-        Icons.person,
-        size: 54,
-      ),
-    ),
+    accountEmail:Text(accountEmail, style: TextStyle(color: Colors.white)),
+
+    decoration: BoxDecoration(color: Theme.of(context).primaryColor),
+    currentAccountPicture:
+        CircleAvatar(
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black12,
+          child:Icon(
+            Icons.person,
+            size: 54,
+          ),
+        ),
+    otherAccountsPictures: [
+      SizedBox(height: 35,),
+      IconButton(
+          icon: Icon(
+            Icons.logout,
+            color: Colors.white,
+          ),
+          onPressed: () {
+            _authenticationBloc.add(UserLoggedOut());
+          },
+        )
+    ],
   );
 
-  Widget _makeListItem(_NavigationItem data, NavDrawerState state) => Card(
+  Widget _makeListItem(BuildContext context, _NavigationItem data, NavDrawerState state) => Card(
     color: data.item == state.selectedItem
-        ? Colors.black12
-        : Colors.white,
+        ? Colors.white54
+        : Theme.of(context).backgroundColor,
     shape: ContinuousRectangleBorder(borderRadius: BorderRadius.zero),
     // So we see the selected highlight
     borderOnForeground: true,
@@ -228,16 +258,16 @@ class NavDrawerWidget extends StatelessWidget {
           data.title!,
           style: TextStyle(
             color: data.item == state.selectedItem
-                ? Colors.white
-                : Colors.blueGrey,
+                ? Theme.of(context).textTheme.bodyText1!.color
+                : Theme.of(context).textTheme.bodyText2!.color,
           ),
         ),
         leading: Icon(
           data.icon,
           // if it's selected change the color
           color: data.item == state.selectedItem
-              ? Colors.white
-              : Colors.blueGrey,
+              ? Theme.of(context).textTheme.bodyText1!.color
+              : Theme.of(context).textTheme.bodyText2!.color,
         ),
         onTap: () => _handleItemClick(context, data.item),
       ),

@@ -10,6 +10,7 @@ import 'posts/cubits/cubits.dart';
 import 'posts/posts.dart';
 import 'signup/blocs/blocs.dart';
 import 'signup/signup.dart';
+import 'themes/themes.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,6 +28,9 @@ void main() async{
         child:
               MultiBlocProvider(
                   providers: [
+                    BlocProvider<ThemeBloc>(
+                        create: (context) => ThemeBloc()
+                    ),
                     BlocProvider<AuthenticationBloc>(
                       create: (context) {
                          AuthenticationRepository authenticationRepository = RepositoryProvider.of<AuthenticationRepository>(context);
@@ -97,20 +101,23 @@ class _MyAppState extends State<MyApp> {
                 buildWhen: (previousState, currentState) =>
                 previousState != currentState,
                 builder: (_, localeState) {
-                  return MaterialApp(
-                      title: 'Starter App',
-                      theme: ThemeData(
-                        primarySwatch: Colors.blue,
-                      ),
-                      supportedLocales: AppLocalizationsSetup.supportedLocales,
-                      localizationsDelegates: AppLocalizationsSetup.localizationsDelegates,
-                      localeResolutionCallback: AppLocalizationsSetup
-                          .localeResolutionCallback,
-                      // Each time a new state emitted, the app will be rebuilt with the new
-                      // locale.
-                      locale: localeState.locale,
-                      home: MyHomePage(title: "Posts"),
-                  );
+                    return BlocBuilder<ThemeBloc, ThemeState>(
+                        builder: (_, themState){
+                          return MaterialApp(
+                            title: 'Starter App',
+                            theme: themState.themeData,
+                            supportedLocales: AppLocalizationsSetup.supportedLocales,
+                            localizationsDelegates: AppLocalizationsSetup.localizationsDelegates,
+                            localeResolutionCallback: AppLocalizationsSetup
+                                .localeResolutionCallback,
+                            // Each time a new state emitted, the app will be rebuilt with the new
+                            // locale.
+                            locale: localeState.locale,
+                            home: MyHomePage(title: "Posts"),
+                          );
+                        }
+                    );
+
                   }
             );
           } else if(state is RedirectToSignUpPage){
@@ -118,20 +125,24 @@ class _MyAppState extends State<MyApp> {
                 buildWhen: (previousState, currentState) =>
                 previousState != currentState,
                 builder: (_, localeState) {
-                  return MaterialApp(
-                      title: 'Starter App',
-                      theme: ThemeData(
-                        primarySwatch: Colors.blue,
-                      ),
-                      supportedLocales: AppLocalizationsSetup.supportedLocales,
-                      localizationsDelegates: AppLocalizationsSetup.localizationsDelegates,
-                      localeResolutionCallback: AppLocalizationsSetup
-                          .localeResolutionCallback,
-                      // Each time a new state emitted, the app will be rebuilt with the new
-                      // locale.
-                      locale: localeState.locale,
-                      home: SignUpPage(title: "",)
-                  );
+                    return BlocBuilder<ThemeBloc, ThemeState>(
+                        builder: (_, themState) {
+                            return
+                                MaterialApp(
+                                    title: 'Starter App',
+                                    theme: themState.themeData,
+                                    supportedLocales: AppLocalizationsSetup.supportedLocales,
+                                    localizationsDelegates: AppLocalizationsSetup.localizationsDelegates,
+                                    localeResolutionCallback: AppLocalizationsSetup
+                                        .localeResolutionCallback,
+                                    // Each time a new state emitted, the app will be rebuilt with the new
+                                    // locale.
+                                    locale: localeState.locale,
+                                    home: SignUpPage(title: "",)
+                                );
+
+                        }
+                    );
                 }
             );
           }else{
@@ -139,23 +150,27 @@ class _MyAppState extends State<MyApp> {
                 buildWhen: (previousState, currentState) =>
                 previousState != currentState,
                 builder: (_, localeState) {
-                  return MaterialApp(
-                      title: 'Starter App',
-                      theme: ThemeData(
-                        primarySwatch: Colors.blue,
-                      ),
-                      supportedLocales: AppLocalizationsSetup.supportedLocales,
-                      localizationsDelegates: AppLocalizationsSetup.localizationsDelegates,
-                      localeResolutionCallback: AppLocalizationsSetup
-                          .localeResolutionCallback,
-                      // Each time a new state emitted, the app will be rebuilt with the new
-                      // locale.
-                      locale: localeState.locale,
-                      home: LoginPage()
-                  );
+                  return BlocBuilder<ThemeBloc, ThemeState>(
+                          builder: (_, themeState){
+                              return MaterialApp(
+                                  title: 'Starter App',
+                                  theme: themeState.themeData,
+                                  supportedLocales: AppLocalizationsSetup.supportedLocales,
+                                  localizationsDelegates: AppLocalizationsSetup.localizationsDelegates,
+                                  localeResolutionCallback: AppLocalizationsSetup
+                                      .localeResolutionCallback,
+                                  // Each time a new state emitted, the app will be rebuilt with the new
+                                  // locale.
+                                  locale: localeState.locale,
+                                  home: LoginPage()
+                              );
 
-                      }
-                );
+                          }
+                      );
+
+
+                }
+            );
           }
         }
 

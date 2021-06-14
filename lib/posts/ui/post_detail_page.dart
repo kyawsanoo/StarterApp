@@ -47,8 +47,8 @@ class _PostDetailPageState extends State<PostDetailPage>{
           }else if(state is PostLoadedState){
             final Post post = state.post;
             return
-            ListTile(title: Text(post.body),
-            subtitle :Text(post.body));
+            ListTile(title: Text(post.title, style: TextStyle(fontSize: 14, color: Theme.of(context).textTheme.bodyText1!.color)),
+            subtitle :Text(post.body, style: TextStyle(fontSize: 14, color: Theme.of(context).textTheme.bodyText1!.color)));
           }else if(state is ErrorState){
             return Container(child: Text("$state.error"));
           }else{
