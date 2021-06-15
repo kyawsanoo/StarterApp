@@ -26,7 +26,7 @@ class _MyHomePageState extends State<MyHomePage> {
   late NavDrawerBloc _navDrawerBloc;
   late ThemeBloc _themeBloc;
   late Widget _content;
-  bool isDarkTheme = false;
+  late bool _isDarkTheme;
 
   @override
   void initState() {
@@ -34,6 +34,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     BlocProvider.of<PostListCubit>(context)..fetchPostList();
     _themeBloc = BlocProvider.of<ThemeBloc>(context);
+    _isDarkTheme = _themeBloc.state.themeData == AppThemes.appThemeData[AppTheme.darkTheme];
     _navDrawerBloc = BlocProvider.of<NavDrawerBloc>(context);
     _content = _getContentForState(_navDrawerBloc.state);
     _authenticationBloc = BlocProvider.of<AuthenticationBloc>(context);
@@ -70,24 +71,18 @@ class _MyHomePageState extends State<MyHomePage> {
                           context.read<LocaleBloc>().add(ToggleLanguage(newLanguage: AppLocalizations.of(context).isEnLocale? 'my' : 'en'));
                         },
                       ),
-                      BlocBuilder<ThemeBloc, ThemeState>(
-                          builder: (_, themeState){
-                            return Switch(
-                              value: isDarkTheme,
+                      Switch(
+                              value: _isDarkTheme,
                               onChanged: (value) {
-                                  isDarkTheme = value;
-                                  print("isDarkTheme $isDarkTheme");
-                                  if(isDarkTheme){
-                                    _themeBloc.add(ThemeEvent(appTheme: AppTheme.darkTheme));
-                                  }else{
-                                    _themeBloc.add(ThemeEvent(appTheme: AppTheme.lightTheme));
-                                  }
+                                  _isDarkTheme = value;
+                                  print("isDarkTheme $_isDarkTheme");
+                                  _themeBloc.add(ToggleTheme(_isDarkTheme? AppTheme.darkTheme : AppTheme.lightTheme));
                               },
                               activeTrackColor: Theme.of(context).textTheme.bodyText1!.color,
                               activeColor: Theme.of(context).primaryColorDark,
-                            );
+                            )
 
-                          })
+
                                           ],
                   ),
                   body: AnimatedSwitcher(

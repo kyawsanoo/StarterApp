@@ -3,7 +3,8 @@
 This project is a bloc project using flutter_bloc package. 
  
 ## The app include 
-- Locale Bloc for the entire app's localization
+- ThemeBloc for switching the entire app's theme Light or Dark
+- Locale Bloc for the entire app's translation English or Myanmar
 - Login Bloc for user login
 - Sign Up Bloc for user sign up
 - Post List Cubit for getting user post
@@ -11,7 +12,7 @@ This project is a bloc project using flutter_bloc package.
 - Navigation Drawer Bloc
 - Form validation
 - Controls http success and error response
-- Store user information and app changed language in preference
+- Store theme info, user data, language in preference
 
 
 ### The app use the test Apis for backend

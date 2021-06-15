@@ -32,8 +32,8 @@ class _LoginPageState extends State<LoginPage>{
   @override
   void initState() {
     super.initState();
-    _isDarkTheme = false;
     _themeBloc = BlocProvider.of<ThemeBloc>(context);
+    _isDarkTheme = _themeBloc.state.themeData == AppThemes.appThemeData[AppTheme.darkTheme];
   }
 
   @override
@@ -54,24 +54,16 @@ class _LoginPageState extends State<LoginPage>{
                        context.read<LocaleBloc>().add(ToggleLanguage(newLanguage: AppLocalizations.of(context).isEnLocale? 'my' : 'en'));
                      },
                    ),
-                   BlocBuilder<ThemeBloc, ThemeState>(
-                       builder: (_, themeState){
-                         return Switch(
-                           value: _isDarkTheme,
-                           onChanged: (value) {
-                             _isDarkTheme = value;
-                             print("isDarkTheme $_isDarkTheme");
-                             if(_isDarkTheme){
-                               _themeBloc.add(ThemeEvent(appTheme: AppTheme.darkTheme));
-                             }else{
-                               _themeBloc.add(ThemeEvent(appTheme: AppTheme.lightTheme));
-                             }
-                           },
-                           activeTrackColor: Theme.of(context).textTheme.bodyText1!.color,
-                           activeColor: Theme.of(context).primaryColorDark,
-                         );
-
-                       })
+                   Switch(
+                     value: _isDarkTheme,
+                     onChanged: (value) {
+                       _isDarkTheme = value;
+                       print("isDarkTheme $_isDarkTheme");
+                       _themeBloc.add(ToggleTheme(_isDarkTheme? AppTheme.darkTheme : AppTheme.lightTheme));
+                     },
+                     activeTrackColor: Theme.of(context).textTheme.bodyText1!.color,
+                     activeColor: Theme.of(context).primaryColorDark,
+                   )
 
                  ],
                ),
@@ -218,20 +210,21 @@ class _LoginButton extends StatelessWidget {
             child: Center(child: CircularProgressIndicator(),)
             )
             : ElevatedButton(
-          key: const Key('loginForm_continue_raisedButton'),
-          style: ElevatedButton.styleFrom(
-              primary: Theme.of(context).textTheme.bodyText1!.color,
-              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-              textStyle: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.normal)),
-          child: Text(AppLocalizations.of(context).translate('login_btn'),
-            style: TextStyle(color: Theme.of(context).textTheme.bodyText1!.color),),
-          onPressed: state.status.isValidated? () {
-            context.read<LoginBloc>().add(LoginInWithEmailButtonPressed());
-          }
-              : null,
-        );
+                  key: const Key('loginForm_continue_raisedButton'),
+                  style: ElevatedButton.styleFrom(
+                      primary: Theme.of(context).primaryColor,
+                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                      textStyle: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold)),
+                  child: Text(AppLocalizations.of(context).translate('login_btn'),
+                                style: TextStyle(color: Colors.white)
+                  ),
+                  onPressed: state.status.isValidated? () {
+                    context.read<LoginBloc>().add(LoginInWithEmailButtonPressed());
+                  }
+                      : null,
+              );
       },
     );
   }

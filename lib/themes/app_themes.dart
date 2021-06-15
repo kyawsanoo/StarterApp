@@ -1,4 +1,6 @@
-import 'package:flutter/material.dart';class AppThemes {
+import 'package:flutter/material.dart';
+
+class AppThemes {
 
 static final appThemeData = {
     AppTheme.lightTheme: ThemeData(
@@ -12,7 +14,9 @@ static final appThemeData = {
         bodyText2: TextStyle(
           color: Colors.blueGrey,
         ),
+
       ),
+
     ),
 
     AppTheme.darkTheme: ThemeData(
@@ -27,6 +31,7 @@ static final appThemeData = {
           color: Colors.blueGrey,
         ),
       ),
+
     )
   };
 }
