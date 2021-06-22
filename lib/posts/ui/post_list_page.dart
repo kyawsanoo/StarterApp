@@ -1,10 +1,15 @@
+import 'package:badges/badges.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:starterapp/authentication/authentication.dart';
 import 'package:starterapp/localization/localization.dart';
+import 'package:starterapp/notification/notification_bloc.dart';
+import 'package:starterapp/notification/notification_event.dart';
+import 'package:starterapp/notification/notification_state.dart';
 import 'package:starterapp/posts/posts.dart';
 import 'package:starterapp/themes/themes.dart';
+import 'drawer.dart';
 import 'post_detail_page.dart';
 late AuthenticationBloc _authenticationBloc;
 
@@ -27,6 +32,7 @@ class _MyHomePageState extends State<MyHomePage> {
   late ThemeBloc _themeBloc;
   late Widget _content;
   late bool _isDarkTheme;
+  late NotificationBloc _notificationBloc;
 
   @override
   void initState() {
@@ -35,6 +41,7 @@ class _MyHomePageState extends State<MyHomePage> {
     BlocProvider.of<PostListCubit>(context)..fetchPostList();
     _themeBloc = BlocProvider.of<ThemeBloc>(context);
     _isDarkTheme = _themeBloc.state.themeData == AppThemes.appThemeData[AppTheme.darkTheme];
+    _notificationBloc = BlocProvider.of<NotificationBloc>(context);
     _navDrawerBloc = BlocProvider.of<NavDrawerBloc>(context);
     _content = _getContentForState(_navDrawerBloc.state);
     _authenticationBloc = BlocProvider.of<AuthenticationBloc>(context);
@@ -50,18 +57,29 @@ class _MyHomePageState extends State<MyHomePage> {
               });
             },
             child: BlocBuilder<NavDrawerBloc, NavDrawerState>(
-              builder: (BuildContext context, NavDrawerState state) => Scaffold(
-                  drawer: BlocBuilder<AuthenticationBloc, AuthenticationState>(
-                    builder: (BuildContext context, AuthenticationState authenticationState){
-                      if(authenticationState is AuthenticationAuthenticated){
-                        return NavDrawerWidget(authenticationState.user.name, authenticationState.user.email);
-                      }else{
-                        return NavDrawerWidget("unknown name", "unknown email");
-                      }
+              builder: (BuildContext context, NavDrawerState state) {
 
+                return Scaffold(
+                  onDrawerChanged: (isOpened) {
+                    _notificationBloc.add(GetNotificationEvent());
+                  },
+                  onEndDrawerChanged: (isOpened) {
+                    //todo what you need for right drawer
+                  },
+                  drawer: BlocBuilder<NotificationBloc, NotificationState>(
+                    builder: (BuildContext context, NotificationState notficationState ){
+                      return BlocBuilder<AuthenticationBloc, AuthenticationState>(
+                        builder: (BuildContext context, AuthenticationState authenticationState){
+                          if(authenticationState is AuthenticationAuthenticated){
+                            return NavDrawerWidget(authenticationState.user.name, authenticationState.user.email, notficationState.unReadCount, _authenticationBloc);
+                          }else{
+                            return NavDrawerWidget("Guest", "guest@mail.com", notficationState.unReadCount, _authenticationBloc);
+                          }
+
+                        },
+                      );
                     },
                   ),
-
                   appBar: AppBar(
                     title: Text(_getTextForItem(state.selectedItem), style: TextStyle(fontSize: 16,)),
                     actions: <Widget>[
@@ -72,18 +90,16 @@ class _MyHomePageState extends State<MyHomePage> {
                         },
                       ),
                       Switch(
-                              value: _isDarkTheme,
-                              onChanged: (value) {
-                                  _isDarkTheme = value;
-                                  print("isDarkTheme $_isDarkTheme");
-                                  _themeBloc.add(ToggleTheme(_isDarkTheme? AppTheme.darkTheme : AppTheme.lightTheme));
-                              },
-                              activeTrackColor: Theme.of(context).textTheme.bodyText1!.color,
-                              activeColor: Theme.of(context).primaryColorDark,
-                            )
-
-
-                                          ],
+                        value: _isDarkTheme,
+                        onChanged: (value) {
+                          _isDarkTheme = value;
+                          print("isDarkTheme $_isDarkTheme");
+                          _themeBloc.add(ToggleTheme(_isDarkTheme? AppTheme.darkTheme : AppTheme.lightTheme));
+                        },
+                        activeTrackColor: Theme.of(context).textTheme.bodyText1!.color,
+                        activeColor: Theme.of(context).primaryColorDark,
+                      )
+                    ],
                   ),
                   body: AnimatedSwitcher(
                     switchInCurve: Curves.easeInExpo,
@@ -92,7 +108,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: _content,
                   ),
 
-            ),
+                );
+              }
+
           ));
   }
 
@@ -142,9 +160,41 @@ class _MyHomePageState extends State<MyHomePage> {
     }else if(state.selectedItem == NavItem.page_two){
       return BlocBuilder<LocaleBloc, LocaleState>(
           builder: (context, state) {
-            return Center(child: Text(AppLocalizations.of(context).translate("inbox"),
-                style: TextStyle(fontSize: 14, color: Theme.of(context).textTheme.bodyText1!.color))
+            return BlocBuilder<NotificationBloc, NotificationState>(
+                builder: (context, state){
+                  if(state.messageList.length>0) {
+                    print('message list greater than 0');
+                    print('message list ${state.messageList.toList().toString()}');
+
+                  }else{
+                    print('message list not greater than 0');
+                  }
+                  return Stack(
+                    children: [
+                      Visibility(
+                          visible: state.messageList.length>0,
+                          child: ListView.builder(
+                              itemCount: state.messageList.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                return ListTile(
+                                  title: Text(state.messageList[index].title),
+                                  subtitle: Text(state.messageList[index]
+                                      .description),
+                                );
+                              }
+                          )
+                      ),
+                      Visibility(
+                          visible: state.messageList.length == 0,
+                          child: Center(child: Text("You have not yet any message"))
+                      )
+
+                    ],
+                  );
+
+                }
             );
+
           }
       ) ;
     }else{
@@ -175,111 +225,3 @@ class _MyHomePageState extends State<MyHomePage> {
 
 }
 
-class NavDrawerWidget extends StatelessWidget {
-
-  final String accountName;
-  final String accountEmail;
-  List<_NavigationItem> getListItems(BuildContext context){
-    return [
-    _NavigationItem(true, null, null, null),
-    _NavigationItem(false, NavItem.page_one, AppLocalizations.of(context).translate("posts"), Icons.post_add_rounded),
-    _NavigationItem(false, NavItem.page_two, AppLocalizations.of(context).translate("inbox"), Icons.message_rounded),
-    _NavigationItem(false, NavItem.page_three, AppLocalizations.of(context).translate("about_us"), Icons.info_rounded),
-  ];
-
-  }
-
-  NavDrawerWidget(this.accountName, this.accountEmail);
-
-  @override
-  Widget build(BuildContext context) => Drawer(
-      child: Container(
-        color: Theme.of(context).backgroundColor,
-        child: ListView.builder(
-            padding: EdgeInsets.zero,
-            itemCount: getListItems(context).length,
-            itemBuilder: (BuildContext context, int index) =>
-                BlocBuilder<NavDrawerBloc, NavDrawerState>(
-                  builder: (BuildContext context, NavDrawerState state) =>
-                      _buildItem(context, getListItems(context)[index], state),
-                )),
-      )
-  );
-
-  Widget _buildItem(BuildContext context, _NavigationItem data, NavDrawerState state) => data.header
-      ? _makeHeaderItem(context)
-      : _makeListItem(context, data, state);
-
-  Widget _makeHeaderItem(BuildContext context) => UserAccountsDrawerHeader(
-    accountName: Text(accountName, style: TextStyle(color: Colors.white)),
-    accountEmail:Text(accountEmail, style: TextStyle(color: Colors.white)),
-
-    decoration: BoxDecoration(color: Theme.of(context).primaryColor),
-    currentAccountPicture:
-        CircleAvatar(
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black12,
-          child:Icon(
-            Icons.person,
-            size: 54,
-          ),
-        ),
-    otherAccountsPictures: [
-      SizedBox(height: 35,),
-      IconButton(
-          icon: Icon(
-            Icons.logout,
-            color: Colors.white,
-          ),
-          onPressed: () {
-            _authenticationBloc.add(UserLoggedOut());
-          },
-        )
-    ],
-  );
-
-  Widget _makeListItem(BuildContext context, _NavigationItem data, NavDrawerState state) => Card(
-    color: data.item == state.selectedItem
-        ? Colors.white54
-        : Theme.of(context).backgroundColor,
-    shape: ContinuousRectangleBorder(borderRadius: BorderRadius.zero),
-    // So we see the selected highlight
-    borderOnForeground: true,
-    elevation: 0,
-    margin: EdgeInsets.zero,
-    child: Builder(
-      builder: (BuildContext context) => ListTile(
-        title: Text(
-          data.title!,
-          style: TextStyle(
-            color: data.item == state.selectedItem
-                ? Theme.of(context).textTheme.bodyText1!.color
-                : Theme.of(context).textTheme.bodyText2!.color,
-          ),
-        ),
-        leading: Icon(
-          data.icon,
-          // if it's selected change the color
-          color: data.item == state.selectedItem
-              ? Theme.of(context).textTheme.bodyText1!.color
-              : Theme.of(context).textTheme.bodyText2!.color,
-        ),
-        onTap: () => _handleItemClick(context, data.item),
-      ),
-    ),
-  );
-
-  void _handleItemClick(BuildContext context, NavItem? item) {
-    BlocProvider.of<NavDrawerBloc>(context).add(NavigateTo(item!));
-    Navigator.pop(context);
-  }
-
-}
-// helper class used to represent navigation list items
-class _NavigationItem {
-  final bool header;
-  final NavItem? item;
-  final String? title;
-  final IconData? icon;
-  _NavigationItem(this.header, this.item, this.title, this.icon);
-}
