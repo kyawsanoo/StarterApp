@@ -10,6 +10,8 @@ This project is a bloc project using flutter_bloc package.
 - Post List Cubit for getting user post
 - Post Detail Cubit for getting user post detail 
 - Navigation Drawer Bloc
+- NotificationBloc for Inbox message using firebase FCM 
+- Sqlite for inbox message offline storage
 - Form validation
 - Controls http success and error response
 - Store theme info, user data, language in preference
