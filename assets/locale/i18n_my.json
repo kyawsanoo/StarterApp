@@ -11,6 +11,14 @@
   "posts": "ပို့စ်များ",
   "post_detail": "ပို့စ်အသေးစိတ်",
   "inbox": "မက်ဆေ့ခ်ျများ",
-  "about_us": "ဆက်သွယ်ရန်"
+  "about_us": "ဆက်သွယ်ရန်",
+  "message_detail": "မက်ဆေ့ခ်ျအသေးစိတ်",
+
+  "want_delete_message": "ဒီမက်ဆေ့ခ်ကိုဖျက်ချင်ပါသလား",
+  "confirm_to_delete": "ဖျက်ပစ်ပါ",
+  "not_confirm_to_delete" : "မဖျက်ပါ",
+  "message_deleted_successfully": "မက်ဆေ့ခ်ျကိုအောင်မြင်စွာဖျက်လိုက်သည်",
+  "sure_to_delete_all" : "မက်ဆေ့ခ်ျအားလုံးကိုဖျက်ပစ်ရန်သင်သေချာပါသလား။"
+
 
 }

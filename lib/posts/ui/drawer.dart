@@ -6,6 +6,7 @@ import 'package:starterapp/localization/localization.dart';
 
 import '../posts.dart';
 
+
 class NavDrawerWidget extends StatelessWidget {
 
   final String accountName;
@@ -115,15 +116,19 @@ class NavDrawerWidget extends StatelessWidget {
                     : Theme.of(context).textTheme.bodyText2!.color,
               ),
             ),
-            Badge(
-              badgeColor: Colors.red,
-              position: BadgePosition(),
-              badgeContent: Text(
-                '${unReadCount}',
-                style: TextStyle(color: Colors.white),
-              ),
-              child: Text(""),
+            Visibility(
+                visible: unReadCount>0,
+                child: Badge(
+                    badgeColor: Theme.of(context).primaryColor,
+                    position: BadgePosition(),
+                    badgeContent: Text(
+                      '${unReadCount}',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    child: Text(""),
+                )
             )
+
 
           ],
         )

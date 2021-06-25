@@ -1,12 +1,12 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
-import 'message_model.dart';
+import '../models/message_model.dart';
 
 
 class DatabaseHelper {
 
-  static final _databaseName = "app_inbox.db";
+  static final _databaseName = "inbox_center.db";
   static final _databaseVersion = 1;
 
   static final table = 'noti';

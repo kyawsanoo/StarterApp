@@ -1,10 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:starterapp/inbox/message_model.dart';
-import 'package:starterapp/inbox/sqlite_db_helper.dart';
-import 'package:starterapp/notification/notification_event.dart';
+import 'package:starterapp/notification/blocs/notification_event.dart';
 import 'package:uuid/uuid.dart';
 import 'package:uuid/uuid_util.dart';
 
+import '../notification.dart';
 import 'notification_state.dart';
 
 class NotificationBloc extends Bloc<NotificationEvent, NotificationState>{
@@ -23,6 +22,10 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState>{
       convertFormattedMessageAndSave(event.message);
     }else if(event is GetNotificationEvent){
       print('getting message from database');
+    }else if(event is ReadNotificationEvent){
+      await DatabaseHelper.instance.updateIsRead(event.message);
+    }else if(event is DeleteNotificationEvent){
+      await DatabaseHelper.instance.delete(event.message);
     }
     List<FirebaseMessageModel> messages = await DatabaseHelper.instance.getAllMessages();
     int? unReadCount = await DatabaseHelper.instance.getUnreadCount();
@@ -45,7 +48,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState>{
     print("promotion page url ${message['promotionPageUrl']}" );
     FirebaseMessageModel notiMessage = FirebaseMessageModel(uuid: v4_crypto,
         title: message['title'],
-        description: message['description'] + message['description2'],
+        description: message['description'] + " " +  message['description2'],
         isRead: 0,
         otp: message['otp'].toString(),
         image: message['image'],

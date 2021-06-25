@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
-import 'package:starterapp/inbox/message_model.dart';
+
+import '../notification.dart';
 
 class NotificationState extends Equatable{
   int unReadCount;

@@ -4,13 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:starterapp/authentication/authentication.dart';
 import 'package:starterapp/localization/localization.dart';
-import 'package:starterapp/notification/notification_bloc.dart';
-import 'package:starterapp/notification/notification_event.dart';
-import 'package:starterapp/notification/notification_state.dart';
+import 'package:starterapp/notification/notification.dart';
 import 'package:starterapp/posts/posts.dart';
 import 'package:starterapp/themes/themes.dart';
 import 'drawer.dart';
 import 'post_detail_page.dart';
+
 late AuthenticationBloc _authenticationBloc;
 
 class MyHomePage extends StatefulWidget {
@@ -33,6 +32,7 @@ class _MyHomePageState extends State<MyHomePage> {
   late Widget _content;
   late bool _isDarkTheme;
   late NotificationBloc _notificationBloc;
+
 
   @override
   void initState() {
@@ -64,7 +64,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     _notificationBloc.add(GetNotificationEvent());
                   },
                   onEndDrawerChanged: (isOpened) {
-                    //todo what you need for right drawer
+                    //what you need for right drawer
                   },
                   drawer: BlocBuilder<NotificationBloc, NotificationState>(
                     builder: (BuildContext context, NotificationState notficationState ){
@@ -122,6 +122,14 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  _navigateToInboxDetailPage (BuildContext context, FirebaseMessageModel message){
+    print("inboxMessageDetail  $message");
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => InboxDetailPage(message: message)),
+    );
+  }
+
   Widget _getContentForState(NavDrawerState state){
     if(state.selectedItem == NavItem.page_one) {
       return
@@ -173,20 +181,76 @@ class _MyHomePageState extends State<MyHomePage> {
                     children: [
                       Visibility(
                           visible: state.messageList.length>0,
-                          child: ListView.builder(
+                          child: Container(
+                              padding:  EdgeInsets.all(5),
+                              child: ListView.builder(
                               itemCount: state.messageList.length,
                               itemBuilder: (BuildContext context, int index) {
-                                return ListTile(
-                                  title: Text(state.messageList[index].title),
-                                  subtitle: Text(state.messageList[index]
-                                      .description),
+                                return Dismissible(
+                                    background: stackBehindDismiss(),
+                                    key: ObjectKey(state.messageList[index]),
+                                    child: Container (
+                                    padding:EdgeInsets.only(top: 5.0, bottom: 5.0),
+                                    decoration: new BoxDecoration (
+                                      //color: state.messageList[index].isRead==0? Theme.of(context).unselectedWidgetColor: Theme.of(context).selectedRowColor,
+                                      border: Border(bottom: BorderSide(color: Theme.of(context).dividerColor),),
+                                    ),
+                                    child: ListTile(
+                                      leading: state.messageList[index].isRead==0? Icon(Icons.info,
+                                        color: Theme.of(context).primaryColor,):Icon(Icons.info_outline, color: Theme.of(context).primaryColor),
+                                      title: Text(state.messageList[index].title,
+                                          style: TextStyle(fontSize: 14, color: Theme.of(context).textTheme.bodyText1!.color,
+                                              fontWeight: FontWeight.bold)
+                                      ),
+                                      subtitle: Text(state.messageList[index]
+                                          .description, style: TextStyle(fontSize: 14, color: Theme.of(context).textTheme.bodyText1!.color)
+                                      ),
+                                      onTap: () {
+                                        _notificationBloc.add(ReadNotificationEvent(state.messageList[index]));//change message from not read into read
+                                        _navigateToInboxDetailPage(context, state.messageList[index]);
+                                      },
+                                    ),
+                                  ),
+                                    onDismissed: (direction) {
+                                      var message = state.messageList.elementAt(index);
+
+                                      // Show a snackbar. This snackbar could also contain "Undo" actions.
+                                      final scaff = Scaffold.of(context);
+                                      scaff.showSnackBar(SnackBar(
+                                        backgroundColor: Colors.black,
+                                        content: Text(AppLocalizations.of(context).translate("message_deleted_successfully"), style: TextStyle(color: Colors.white)),
+                                        duration: Duration(seconds: 5),
+
+                                      )
+                                      );
+                                      // Remove the item from the data source.
+                                      deleteItem(state, index,message, direction);
+                                    },
+                                    confirmDismiss: (DismissDirection dismissDirection) async {
+                                      switch(dismissDirection) {
+                                        case DismissDirection.endToStart:
+                                          return await _showConfirmationDialog(context) == true;
+                                        case DismissDirection.startToEnd:
+                                          return await _showConfirmationDialog(context) == true;
+                                        case DismissDirection.horizontal:
+                                        case DismissDirection.vertical:
+                                        case DismissDirection.up:
+                                        case DismissDirection.down:
+                                          assert(false);
+                                      }
+                                      return false;
+                                    },
+
                                 );
+
                               }
-                          )
+                              )
+                          ),
+
                       ),
                       Visibility(
                           visible: state.messageList.length == 0,
-                          child: Center(child: Text("You have not yet any message"))
+                          child: Center(child: Text(AppLocalizations.of(context).translate("any_message_received")))
                       )
 
                     ],
@@ -222,6 +286,100 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
   }
+
+  Widget stackBehindDismiss() {
+    return Container(
+      alignment: Alignment.centerRight,
+      padding: EdgeInsets.only(right: 20.0),
+      color: Colors.orange,
+      child: Icon(
+        Icons.delete,
+        color: Colors.white,
+      ),
+    );
+  }
+
+  void deleteItem(NotificationState state, index, message, direction){
+      state.messageList.removeAt(index);
+      _notificationBloc.add(DeleteNotificationEvent(message));
+  }
+
+  /*void undoDeletion(index, item){
+    setState((){
+      messageList.insert(index, item);
+    });
+  }
+
+  void clearAllMessages(){
+    setState((){
+      DatabaseHelper.instance.clearTable();
+      messageList.clear();
+      DatabaseHelper.instance.getUnreadCount().then((value) {
+        setState(() {
+          print("count: $value");
+          notifier.setCount(value);
+        });
+      }).catchError((error) {
+        print(error);
+      });
+    });
+  }
+  */
+
+  Future<bool?> _showConfirmationDialog(BuildContext context) {
+    return showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          title: Text(AppLocalizations.of(context).translate("want_delete_message"), style: TextStyle(color: Colors.black),),
+          actions: <Widget>[
+            FlatButton(
+              child: Text(AppLocalizations.of(context).translate('confirm_to_delete'), style: TextStyle(color: Colors.black),),
+              onPressed: () {
+                Navigator.pop(context, true); // showDialog() returns true
+              },
+            ),
+            FlatButton(
+              child: Text(AppLocalizations.of(context).translate('not_confirm_to_delete'), style: TextStyle(color: Colors.black),),
+              onPressed: () {
+                Navigator.pop(context, false); // showDialog() returns false
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  /*Future<bool?> _showDeleteAllConfirmationDialog(BuildContext context) {
+    return showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          title: Text(allTranslations.text("sure_to_delete_all" ), style: TextStyle(color: Colors.black),),
+          actions: <Widget>[
+            FlatButton(
+              child: Text(allTranslations.text('confirm_to_delete'), style: TextStyle(color: Colors.black),),
+              onPressed: () {
+                Navigator.pop(context, true);
+                clearAllMessages();
+              },
+            ),
+            FlatButton(
+              child: Text(allTranslations.text('not_confirm_to_delete'), style: TextStyle(color: Colors.black),),
+              onPressed: () {
+                Navigator.pop(context, false); // showDialog() returns false
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }*/
 
 }
 

@@ -11,5 +11,15 @@
   "posts": "Posts",
   "post_detail": "Post Detail",
   "inbox": "Inbox",
-  "about_us": "About Us"
+  "about_us": "About Us",
+  "message_detail": "Message Detail",
+
+  "any_message_received": "သင်မည်သည့်ဒေတာမက်ဆေ့ခ်ျကိုမရရှိသေးပါ။",
+  "any_message_received": "You have not received any message yet.",
+  "want_delete_message": "Do you want to delete this message?",
+  "confirm_to_delete": "Yes",
+  "not_confirm_to_delete" : "No",
+  "message_deleted_successfully": "Message was deleted successfully",
+
+  "sure_to_delete_all" : "Are you sure to delete all messages?"
 }
