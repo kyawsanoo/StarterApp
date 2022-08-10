@@ -3,7 +3,7 @@
 This project is a bloc project using flutter_bloc package. 
 
 ## Screenshot
-slide menu dark|post list |language
+slide menu dark|posts with dark theme |posts with light theme
 :--:|:--:|:--:
 <img src="images/menu_dark.jpg" width="250px" />|<img src="images/post_list_dark.jpg" width="250px" />|<img src="images/post_list_light.jpg" width="250px"/>
  
