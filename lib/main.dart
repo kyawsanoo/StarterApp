@@ -15,7 +15,6 @@ import 'themes/themes.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
-  await fcm.init();
 
   runApp(
     MultiRepositoryProvider(
@@ -205,7 +204,6 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     _notificationBloc = BlocProvider.of<NotificationBloc>(context);
-    fcm.controlAllNotifications(_notificationBloc);
 
   }
 }
