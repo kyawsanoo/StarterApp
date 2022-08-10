@@ -1,6 +1,11 @@
 # flutter starter project using bloc
 
 This project is a bloc project using flutter_bloc package. 
+
+## Screenshot
+slide menu dark|post list |language
+:--:|:--:|:--:
+<img src="images/menu_dark.jpg" width="250px" />|<img src="images/post_list_dark.jpg" width="250px" />|<img src="images/post_list_light.jpg" width="250px"/>
  
 ## The app include 
 - ThemeBloc for switching the entire app's theme Light or Dark
